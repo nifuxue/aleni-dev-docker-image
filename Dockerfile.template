@@ -1,0 +1,47 @@
+FROM ubuntu:latest
+
+# Install required packages
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        build-essential \
+        wget \
+        gnupg \
+        x11vnc \
+        xvfb \
+        fluxbox \
+        dbus-x11 \
+        xfonts-base \
+        x11-utils \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Chrome browser
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        google-chrome-stable \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up VNC server
+ENV DISPLAY=:1
+ENV VNC_PORT=5901
+ENV VNC_RESOLUTION=1280x720
+ENV VNC_COL_DEPTH=24
+ENV VNC_PW=password
+
+RUN mkdir -p ~/.vnc \
+    && x11vnc -storepasswd $VNC_PW ~/.vnc/passwd \
+    && echo '#!/bin/bash' > /entrypoint.sh \
+    && echo "Xvfb :1 -screen 0 $VNC_RESOLUTION -depth $VNC_COL_DEPTH &" >> /entrypoint.sh \
+    && echo "fluxbox &" >> /entrypoint.sh \
+    && echo "x11vnc -display :1 -nopw -listen localhost -xkb -ncache_cr -forever &" >> /entrypoint.sh \
+    && echo "xterm" >> /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+# Expose VNC port
+EXPOSE $VNC_PORT
+
+# Set the entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
