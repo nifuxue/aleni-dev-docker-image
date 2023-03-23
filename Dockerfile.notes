@@ -1,0 +1,9 @@
+### add and set user with a passwd
+# RUN useradd -d /home/nifuxue -m nifuxue
+# RUN bash -c 'echo -e "mypasswd\nmypasswd" | passwd nifuxue'
+
+### add a user without a passwd, and grant it sudoer's permission
+# RUN useradd -d /home/nifuxue -m nifuxue \
+#     && echo "nifuxue ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/nifuxue
+# USER nifuxue
+# WORKDIR /home/nifuxue

@@ -19,17 +19,21 @@ RUN apt-get update \
         build-essential \
         wget \
         curl \
-        sudo \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        sudo
+    # && apt-get clean \
+    # && rm -rf /var/lib/apt/lists/*
 
-### add and set user
-RUN useradd -d /home/nifuxue -m nifuxue
-RUN bash -c 'echo -e "mypasswd\nmypasswd" | passwd nifuxue'
-USER nifuxue
-WORKDIR /home/nifuxue
+### install tiger vnc_server
+# RUN apt-get install -y \
+#         xfce4 xfce4-goodies \
+#         tigervnc-standalone-server \
+#         tigervnc-common \
+#         tigervnc-xorg-extension
 
-### install vnc_server
+### install tight vnc_server
+RUN apt-get install -y \
+        xfce4 xfce4-goodies \
+        tightvncserver
 
 
 
